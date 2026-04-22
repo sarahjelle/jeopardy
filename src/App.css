@@ -1,10 +1,406 @@
+/* ===== Layout ===== */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
   text-align: center;
 }
 
-.card {
-  padding: 2em;
+/* ===== Setup screen ===== */
+.setup-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
 }
+
+.setup-title {
+  font-size: 3rem;
+  color: #f5c518;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.setup-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid #f5c518;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  min-width: 320px;
+}
+
+.setup-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: #f5c518;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.setup-select,
+.setup-input {
+  background: #0d1b6e;
+  color: #fff;
+  border: 1px solid #f5c518;
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.setup-select:focus,
+.setup-input:focus {
+  outline: 2px solid #f5c518;
+  outline-offset: 1px;
+}
+
+.team-names {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.start-button {
+  margin-top: 0.5rem;
+  background: #f5c518;
+  color: #0a0f5e;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.start-button:hover {
+  background: #ffd740;
+  transform: translateY(-1px);
+}
+
+/* ===== Game screen ===== */
+.game-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1rem 2rem;
+  gap: 1rem;
+}
+
+.game-title {
+  font-size: 2.2rem;
+  color: #f5c518;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.turn-indicator {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #0d1b6e;
+  border: 2px solid #f5c518;
+  border-radius: 20px;
+  padding: 0.35rem 1.2rem;
+}
+
+/* ===== Board ===== */
+.board {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.board-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.board-category {
+  background: #0a0f5e;
+  color: #f5c518;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.7rem 0.3rem;
+  border: 2px solid #f5c518;
+  border-radius: 6px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-cell {
+  flex: 1;
+  min-height: 70px;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  border: 2px solid transparent;
+}
+
+.board-cell--available {
+  background: #0d1b6e;
+  color: #f5c518;
+  border-color: #1a2f99;
+}
+
+.board-cell--available:hover {
+  background: #1a2f99;
+  border-color: #f5c518;
+  transform: scale(1.03);
+}
+
+.board-cell--used {
+  background: #1a1a2e;
+  color: #333;
+  cursor: default;
+  border-color: #1a1a2e;
+}
+
+/* ===== Scoreboard ===== */
+.scoreboard {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.score-card {
+  background: #0d1b6e;
+  border: 2px solid #1a2f99;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  min-width: 110px;
+  transition: border-color 0.2s;
+}
+
+.score-card--active {
+  border-color: #f5c518;
+  background: #162280;
+}
+
+.score-team-name {
+  font-weight: 700;
+  color: #f5c518;
+  font-size: 0.9rem;
+}
+
+.score-points {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* ===== Question overlay ===== */
+.question-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.question-card {
+  background: #0a0f5e;
+  border: 3px solid #f5c518;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  max-width: 640px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.question-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f5c518;
+}
+
+.question-text {
+  font-size: 1.5rem;
+  color: #fff;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.question-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.answer-section {
+  background: rgba(245, 197, 24, 0.1);
+  border: 1px solid #f5c518;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  text-align: center;
+}
+
+.answer-label {
+  font-size: 0.85rem;
+  color: #f5c518;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+
+.answer-text {
+  font-size: 1.4rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.judge-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+  width: 100%;
+}
+
+.judge-prompt {
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.judge-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn--primary {
+  background: #f5c518;
+  color: #0a0f5e;
+  border-color: #f5c518;
+}
+
+.btn--primary:hover {
+  background: #ffd740;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: #f5c518;
+  border-color: #f5c518;
+}
+
+.btn--secondary:hover {
+  background: rgba(245, 197, 24, 0.1);
+}
+
+.btn--correct {
+  background: #1a7a1a;
+  color: #fff;
+  border-color: #27ae60;
+}
+
+.btn--correct:hover {
+  background: #27ae60;
+}
+
+.btn--wrong {
+  background: #7a1a1a;
+  color: #fff;
+  border-color: #e74c3c;
+}
+
+.btn--wrong:hover {
+  background: #e74c3c;
+}
+
+/* ===== Finished screen ===== */
+.finished-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.finished-title {
+  font-size: 3rem;
+  color: #f5c518;
+  margin: 0;
+}
+
+.finished-winner {
+  font-size: 1.4rem;
+  color: #fff;
+  margin: 0;
+}
+
+.finished-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 280px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid #f5c518;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+}
+
+.finished-score-row {
+  display: flex;
+  justify-content: space-between;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.finished-score-row:last-child {
+  border-bottom: none;
+}
+

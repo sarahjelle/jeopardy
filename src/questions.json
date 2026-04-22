@@ -1,0 +1,54 @@
+{
+  "categories": [
+    {
+      "name": "Geografi",
+      "questions": [
+        { "value": 100, "question": "Hva er hovedstaden i Norge?", "answer": "Oslo" },
+        { "value": 200, "question": "Hvilket land har flest innbyggere i verden?", "answer": "Kina" },
+        { "value": 300, "question": "Hva heter det lengste elva i Afrika?", "answer": "Nilen" },
+        { "value": 400, "question": "Hvilket land er både et kontinent og et land?", "answer": "Australia" },
+        { "value": 500, "question": "Hva heter havet mellom Europa og Amerika?", "answer": "Atlanterhavet" }
+      ]
+    },
+    {
+      "name": "Historie",
+      "questions": [
+        { "value": 100, "question": "Hvilket år ble Norge selvstendig fra Sverige?", "answer": "1905" },
+        { "value": 200, "question": "Hvem var den første presidenten i USA?", "answer": "George Washington" },
+        { "value": 300, "question": "Hvilket år begynte andre verdenskrig?", "answer": "1939" },
+        { "value": 400, "question": "Hvem oppdaget Amerika i 1492?", "answer": "Kristoffer Columbus" },
+        { "value": 500, "question": "Hva heter den kinesiske keisermuren på kinesisk (pinyin)?", "answer": "Wànlǐ Chángchéng" }
+      ]
+    },
+    {
+      "name": "Vitenskap",
+      "questions": [
+        { "value": 100, "question": "Hva er det kjemiske symbolet for vann?", "answer": "H₂O" },
+        { "value": 200, "question": "Hva er den raskeste farten i universet?", "answer": "Lysets hastighet" },
+        { "value": 300, "question": "Hvor mange bein har en edderkopp?", "answer": "8" },
+        { "value": 400, "question": "Hva heter teorien Darwin er kjent for?", "answer": "Evolusjonsteorien" },
+        { "value": 500, "question": "Hva er halvveringstiden til karbon-14?", "answer": "Ca. 5730 år" }
+      ]
+    },
+    {
+      "name": "Sport",
+      "questions": [
+        { "value": 100, "question": "Hvor mange spillere er det på et fotballag på banen?", "answer": "11" },
+        { "value": 200, "question": "Hvilket land har vunnet flest OL-gull i vinterlek?", "answer": "Norge" },
+        { "value": 300, "question": "Hva heter tennisturneringen som spilles på gress i England?", "answer": "Wimbledon" },
+        { "value": 400, "question": "Hvor mange hull er det på en standard golfbane?", "answer": "18" },
+        { "value": 500, "question": "Hvem er den eneste norske til å ha vunnet Tour de France?", "answer": "Jonas Vingegaard (og Edvald Boasson Hagen har aldri vunnet – riktig svar er ingen nordmann har vunnet Tour de France)" }
+      ]
+    },
+    {
+      "name": "Pop-kultur",
+      "questions": [
+        { "value": 100, "question": "Hvilken norsk artist ga ut sangen «What's Up» i 1992?", "answer": "4 Non Blondes (ikke norsk) – riktig: «Alexander Rybak» vant Eurovision i 2009 med «Fairytale»" },
+        { "value": 200, "question": "Hvilken Disney-film handler om en ung løve som heter Simba?", "answer": "The Lion King (Løvenes Konge)" },
+        { "value": 300, "question": "Hva heter den magiske skolen i Harry Potter-bøkene?", "answer": "Galtvort (Hogwarts)" },
+        { "value": 400, "question": "Hvilken norsk TV-serie om ungdommer ble en internasjonal hit på Netflix?", "answer": "SKAM" },
+        { "value": 500, "question": "Hvem regisserte filmtrilogien «Ringenes Herre»?", "answer": "Peter Jackson" }
+      ]
+    }
+  ]
+}
