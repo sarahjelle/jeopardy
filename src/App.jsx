@@ -8,10 +8,10 @@ function App() {
 	const [usedCards, setUsedCards] = useState(new Set());
 	const [activeCard, setActiveCard] = useState(null);
 
-	function handleSelectCard(colIndex, rowIndex, value) {
+	function handleSelectCard(categoryIndex, questionIndex, value) {
 		const { question, answer } =
-			questionsData.categories[colIndex].questions[rowIndex];
-		setActiveCard({ colIndex, rowIndex, value, question, answer });
+			questionsData.categories[categoryIndex].questions[questionIndex];
+		setActiveCard({ categoryIndex, questionIndex, value, question, answer });
 	}
 
 	function handleBackToBoard() {
@@ -19,7 +19,7 @@ function App() {
 	}
 
 	function handleResult() {
-		const cardKey = `${activeCard.colIndex}-${activeCard.rowIndex}`;
+		const cardKey = `${activeCard.categoryIndex}-${activeCard.questionIndex}`;
 
 		const newUsed = new Set(usedCards);
 		newUsed.add(cardKey);

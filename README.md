@@ -7,7 +7,6 @@ Når vi er ferdige vil spillet ha:
 -   Et 5×5 brett med kategorier og poengsummer
 -   Spørsmål som dukker opp når man trykker på et kort
 -   Mulighet til å vise svaret
--   Lagregistrering og automatisk poengtelling
 
 Ingen kunnskap om React er nødvendig på forhånd – vi forklarer det vi trenger underveis. 🚀
 
@@ -449,19 +448,18 @@ import questionsData from '../questions.json';
 
 function Board() {
     const { categories } = questionsData;
-    const pointValues = [100, 200, 300, 400, 500];
 
     return (
         <div className="board">
-            {categories.map((category, colIndex) => (
-                <div key={colIndex} className="board-column">
+            {categories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="board-column">
                     <div className="board-category">{category.name}</div>
-                    {pointValues.map((value, rowIndex) => (
+                    {category.questions.map((question, questionIndex) => (
                         <button
-                            key={rowIndex}
+                            key={questionIndex}
                             className="board-cell board-cell--available"
                         >
-                            ${value}
+                            ${question.value}
                         </button>
                     ))}
                 </div>
@@ -473,7 +471,7 @@ function Board() {
 export default Board;
 ```
 
-Vi bruker `.map()` to ganger: én gang for kategoriene (kolonnene) og én gang for poengsummene (radene). `className`-verdiene er ferdiglagde CSS-klasser som gir brettet utseende.
+Vi bruker `.map()` to ganger: én gang for kategoriene (kolonnene) og én gang for spørsmålene (radene). `question.value` hentes direkte fra JSON-filen. `className`-verdiene er ferdiglagde CSS-klasser som gir brettet utseende.
 
 </details>
 
@@ -487,19 +485,18 @@ import questionsData from '../questions.json';
 
 function Board() {
     const { categories } = questionsData;
-    const pointValues = [100, 200, 300, 400, 500];
 
     return (
         <div className="board">
-            {categories.map((category, colIndex) => (
-                <div key={colIndex} className="board-column">
+            {categories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="board-column">
                     <div className="board-category">{category.name}</div>
-                    {pointValues.map((value, rowIndex) => (
+                    {category.questions.map((question, questionIndex) => (
                         <button
-                            key={rowIndex}
+                            key={questionIndex}
                             className="board-cell board-cell--available"
                         >
-                            ${value}
+                            ${question.value}
                         </button>
                     ))}
                 </div>
@@ -589,13 +586,13 @@ export default App;
 import questionsData from './questions.json';
 
 // Inne i App-funksjonen:
-function handleSelectCard(colIndex, rowIndex, value) {
-    const { question, answer } = questionsData.categories[colIndex].questions[rowIndex];
-    setActiveCard({ colIndex, rowIndex, value, question, answer });
+function handleSelectCard(categoryIndex, questionIndex, value) {
+    const { question, answer } = questionsData.categories[categoryIndex].questions[questionIndex];
+    setActiveCard({ categoryIndex, questionIndex, value, question, answer });
 }
 ```
 
-`colIndex` er kolonneindeksen (hvilken kategori), `rowIndex` er radindeksen (hvilket spørsmål), og `value` er poengsummen.
+`categoryIndex` er indeksen til kategorien (kolonnen), `questionIndex` er indeksen til spørsmålet (raden), og `value` er poengsummen.
 
 </details>
 
@@ -627,20 +624,19 @@ function handleSelectCard(colIndex, rowIndex, value) {
 // Board mottar { onSelectCard } som prop
 function Board({ onSelectCard }) {
     const { categories } = questionsData;
-    const pointValues = [100, 200, 300, 400, 500];
 
     return (
         <div className="board">
-            {categories.map((category, colIndex) => (
-                <div key={colIndex} className="board-column">
+            {categories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="board-column">
                     <div className="board-category">{category.name}</div>
-                    {pointValues.map((value, rowIndex) => (
+                    {category.questions.map((question, questionIndex) => (
                         <button
-                            key={rowIndex}
+                            key={questionIndex}
                             className="board-cell board-cell--available"
-                            onClick={() => onSelectCard(colIndex, rowIndex, value)}
+                            onClick={() => onSelectCard(categoryIndex, questionIndex, question.value)}
                         >
-                            ${value}
+                            ${question.value}
                         </button>
                     ))}
                 </div>
@@ -650,7 +646,7 @@ function Board({ onSelectCard }) {
 }
 ```
 
-`onClick={() => onSelectCard(colIndex, rowIndex, value)}` kaller `onSelectCard` med riktig kolonne, rad og verdi når knappen klikkes.
+`onClick={() => onSelectCard(categoryIndex, questionIndex, question.value)}` kaller `onSelectCard` med riktig kategori, spørsmål og verdi når knappen klikkes.
 
 </details>
 
@@ -701,9 +697,9 @@ import questionsData from './questions.json';
 function App() {
     const [activeCard, setActiveCard] = useState(null);
 
-    function handleSelectCard(colIndex, rowIndex, value) {
-        const { question, answer } = questionsData.categories[colIndex].questions[rowIndex];
-        setActiveCard({ colIndex, rowIndex, value, question, answer });
+    function handleSelectCard(categoryIndex, questionIndex, value) {
+        const { question, answer } = questionsData.categories[categoryIndex].questions[questionIndex];
+        setActiveCard({ categoryIndex, questionIndex, value, question, answer });
     }
 
     return (
@@ -831,7 +827,7 @@ function QuestionCard({ question, answer, value, onBack }) {
 ```jsx
 import { useState } from 'react';
 
-function QuestionCard({ question, answer, value, onBack }) {
+function QuestionCard({ question, answer, value, onResult, onBack }) {
     const [revealed, setRevealed] = useState(false);
 
     return (
@@ -855,10 +851,18 @@ function QuestionCard({ question, answer, value, onBack }) {
                 )}
 
                 {revealed && (
-                    <div className="answer-section">
-                        <div className="answer-label">Svar:</div>
-                        <div className="answer-text">{answer}</div>
-                    </div>
+                    <>
+                        <div className="answer-section">
+                            <div className="answer-label">Svar:</div>
+                            <div className="answer-text">{answer}</div>
+                        </div>
+
+                        <div className="question-actions">
+                            <button className="btn btn--primary" onClick={onResult}>
+                                Ferdig
+                            </button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>
@@ -873,13 +877,23 @@ Og i `App.jsx`, erstatt overlay-koden med:
 ```jsx
 import QuestionCard from './components/QuestionCard';
 
+// Legg til disse to funksjonene i App:
+function handleBackToBoard() {
+    setActiveCard(null);
+}
+
+function handleResult() {
+    setActiveCard(null);
+}
+
 // I JSX:
 {activeCard && (
     <QuestionCard
         question={activeCard.question}
         answer={activeCard.answer}
         value={activeCard.value}
-        onBack={() => setActiveCard(null)}
+        onResult={handleResult}
+        onBack={handleBackToBoard}
     />
 )}
 ```
@@ -888,534 +902,161 @@ import QuestionCard from './components/QuestionCard';
 
 ---
 
-## Oppgave 5 – Lag og poeng
+## Oppgave 5 – Merk kort som brukt
 
-Nå skal vi gjøre spillet fullstendig! Vi trenger å registrere lag, holde styr på poeng og tur, og markere kort som er brukt.
+Nå skal vi sørge for at kort man allerede har besvart markeres som brukt, slik at de ikke kan velges igjen.
 
-Denne oppgaven er delt i tre deloppgaver.
+> 💡 **Hva er et Set?**
+> Et `Set` er en JavaScript-samling som bare inneholder unike verdier – ingen duplikater. Vi bruker det for å holde styr på hvilke kort som er brukt: `usedCards.has('0-2')` sjekker om kortet i kategori 0, rad 2 er brukt.
 
----
+### Steg 5a – Legg til usedCards-state i App.jsx
 
-### Oppgave 5a – Oppstartsskjerm for å registrere lag
-
-Appen skal starte med en skjerm der spillerne skriver inn lagnavn.
-
-> 💡 **Fase-styring**
-> Vi bruker en state-variabel `phase` til å holde styr på hvilken del av spillet vi er i: `"setup"` (oppstart), `"game"` (spiller) eller `"finished"` (ferdig). Avhengig av `phase` viser vi ulike komponenter.
-
-#### Steg 5a-1 – Lag en tom SetupScreen-komponent
-
-🏆 Lag filen `src/components/SetupScreen.jsx` med en enkel komponent som viser tittel og en «Start spill»-knapp.
+🏆 Legg til `useState(new Set())` i `App.jsx` for å holde styr på hvilke kort som er brukt.
 
 <details>
-<summary>💡 Slik ser en enkel SetupScreen ut</summary>
+<summary>💡 Slik legger du til usedCards-state</summary>
 
 ```jsx
-function SetupScreen({ onStart }) {
-    return (
-        <div className="setup-screen">
-            <h1 className="setup-title">🎯 Jeopardy</h1>
-            <button className="start-button" onClick={onStart}>
-                Start spill
-            </button>
-        </div>
-    );
-}
-
-export default SetupScreen;
+const [usedCards, setUsedCards] = useState(new Set());
 ```
 
-`onStart` er en funksjon som sendes inn som prop fra `App.jsx`.
+`new Set()` lager et tomt sett. Etter hvert som kort besvares, legger vi til nøkler på formen `` `${categoryIndex}-${questionIndex}` ``.
 
 </details>
 
-#### Steg 5a-2 – Legg til tekstfelter for lagnavn
+### Steg 5b – Lag handleResult-funksjonen
 
-🏆 Legg til state for lagnavn og vis tekstfelter der spillerne kan skrive inn navn.
+🏆 Lag `handleResult`-funksjonen i `App.jsx`. Den skal lage en kopi av `usedCards`-settet, legge til det aktive kortets nøkkel og oppdatere state.
 
-<details>
-<summary>💡 Slik legger du til lagnavn-state og tekstfelter</summary>
-
-```jsx
-import { useState } from 'react';
-
-function SetupScreen({ onStart }) {
-    const [teamNames, setTeamNames] = useState(['Lag 1', 'Lag 2']);
-
-    function handleNameChange(index, value) {
-        setTeamNames((prev) => {
-            const updated = [...prev]; // lag en kopi av listen
-            updated[index] = value;   // oppdater riktig element
-            return updated;
-        });
-    }
-
-    return (
-        <div className="setup-screen">
-            <h1 className="setup-title">🎯 Jeopardy</h1>
-            <div className="setup-card">
-                {teamNames.map((name, i) => (
-                    <label key={i} className="setup-label">
-                        Lagnavn {i + 1}
-                        <input
-                            className="setup-input"
-                            type="text"
-                            value={name}
-                            onChange={(e) => handleNameChange(i, e.target.value)}
-                        />
-                    </label>
-                ))}
-                <button className="start-button" onClick={() => onStart(teamNames)}>
-                    Start spill
-                </button>
-            </div>
-        </div>
-    );
-}
-```
-
-`[...prev]` lager en kopi av listen. Det er viktig å lage en kopi før du endrer den, slik at React oppdager endringen og tegner på nytt.
-
-</details>
-
-#### Steg 5a-3 – Legg til phase-state i App.jsx og vis SetupScreen
-
-🏆 Legg til `phase`-state i `App.jsx` og vis `SetupScreen` når `phase === "setup"`. Når `onStart` kalles, skal `phase` settes til `"game"`.
+> 💡 **Hvorfor kopiere settet?**
+> React oppdager kun endringer dersom du setter en ny verdi med `setUsedCards`. Derfor lager vi en kopi med `new Set(usedCards)` før vi legger til, akkurat som vi lager en kopi av en liste med `[...liste]`.
 
 <details>
-<summary>💡 Slik bruker du phase til å bytte mellom skjermer</summary>
+<summary>💡 Slik lager du handleResult</summary>
 
 ```jsx
-import { useState } from 'react';
-import SetupScreen from './components/SetupScreen';
-
-function App() {
-    const [phase, setPhase] = useState('setup');
-    const [teams, setTeams] = useState([]);
-
-    function handleStart(teamNames) {
-        setTeams(teamNames.map((name) => ({ name, score: 0 })));
-        setPhase('game');
-    }
-
-    if (phase === 'setup') {
-        return <SetupScreen onStart={handleStart} />;
-    }
-
-    // Resten av spillet vises her når phase === 'game'
-    return (
-        <div className="game-screen">
-            <h1 className="game-title">🎯 Jeopardy</h1>
-            {/* ... */}
-        </div>
-    );
+function handleResult() {
+    const cardKey = `${activeCard.categoryIndex}-${activeCard.questionIndex}`;
+    const newUsed = new Set(usedCards);
+    newUsed.add(cardKey);
+    setUsedCards(newUsed);
+    setActiveCard(null);
 }
-```
-
-Legg merke til at vi returnerer `<SetupScreen />` tidlig hvis `phase === 'setup'`. Da vises ikke resten av koden i det hele tatt.
-
-</details>
-
-<details>
-<summary>🚨 Løsningsforslag – ferdig SetupScreen.jsx</summary>
-
-```jsx
-import { useState } from 'react';
-
-function SetupScreen({ onStart }) {
-    const [teamCount, setTeamCount] = useState(2);
-    const [teamNames, setTeamNames] = useState(['Lag 1', 'Lag 2']);
-
-    function handleTeamCountChange(count) {
-        const newCount = Number(count);
-        setTeamCount(newCount);
-        setTeamNames((prev) => {
-            const updated = [...prev];
-            while (updated.length < newCount) updated.push(`Lag ${updated.length + 1}`);
-            return updated.slice(0, newCount);
-        });
-    }
-
-    function handleNameChange(index, value) {
-        setTeamNames((prev) => {
-            const updated = [...prev];
-            updated[index] = value;
-            return updated;
-        });
-    }
-
-    function handleStart() {
-        const names = teamNames.map((n, i) => n.trim() || `Lag ${i + 1}`);
-        onStart(names);
-    }
-
-    return (
-        <div className="setup-screen">
-            <h1 className="setup-title">🎯 Jeopardy</h1>
-            <div className="setup-card">
-                <label className="setup-label">
-                    Antall lag
-                    <select
-                        className="setup-select"
-                        value={teamCount}
-                        onChange={(e) => handleTeamCountChange(e.target.value)}
-                    >
-                        {[2, 3, 4, 5, 6].map((n) => (
-                            <option key={n} value={n}>{n} lag</option>
-                        ))}
-                    </select>
-                </label>
-                <div className="team-names">
-                    {teamNames.map((name, i) => (
-                        <label key={i} className="setup-label">
-                            Lagnavn {i + 1}
-                            <input
-                                className="setup-input"
-                                type="text"
-                                value={name}
-                                onChange={(e) => handleNameChange(i, e.target.value)}
-                                maxLength={20}
-                            />
-                        </label>
-                    ))}
-                </div>
-                <button className="start-button" onClick={handleStart}>
-                    Start spill
-                </button>
-            </div>
-        </div>
-    );
-}
-
-export default SetupScreen;
 ```
 
 </details>
 
----
+### Steg 5c – Send usedCards og handleResult ned til riktige komponenter
 
-### Oppgave 5b – Vis poengtavle og hvem sin tur det er
-
-#### Steg 5b-1 – Lag en Scoreboard-komponent
-
-🏆 Lag filen `src/components/Scoreboard.jsx`. Den skal ta imot `teams` (liste med lag) og `currentTeamIndex` (hvem sin tur det er) som props og vise alle lag med poengsum.
+🏆 Send `usedCards` som prop til `Board` og `onResult={handleResult}` som prop til `QuestionCard`.
 
 <details>
-<summary>💡 Slik lager du Scoreboard</summary>
+<summary>💡 Slik sender du propsene</summary>
 
 ```jsx
-function Scoreboard({ teams, currentTeamIndex }) {
+// I App.jsx JSX:
+<Board usedCards={usedCards} onSelectCard={handleSelectCard} />
+
+{activeCard && (
+    <QuestionCard
+        question={activeCard.question}
+        answer={activeCard.answer}
+        value={activeCard.value}
+        onResult={handleResult}
+        onBack={handleBackToBoard}
+    />
+)}
+```
+
+</details>
+
+### Steg 5d – Oppdater Board til å vise brukte kort annerledes
+
+🏆 Oppdater `Board.jsx` til å ta imot `usedCards` som prop. Vis brukte kort med CSS-klassen `board-cell--used` og deaktiver dem.
+
+<details>
+<summary>💡 Slik viser du brukte kort annerledes</summary>
+
+```jsx
+function Board({ usedCards, onSelectCard }) {
+    const { categories } = questionsData;
+
     return (
-        <div className="scoreboard">
-            {teams.map((team, i) => (
-                <div
-                    key={i}
-                    className={`score-card ${i === currentTeamIndex ? 'score-card--active' : ''}`}
-                >
-                    <div className="score-team-name">{team.name}</div>
-                    <div className="score-points">{team.score} poeng</div>
+        <div className="board">
+            {categories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="board-column">
+                    <div className="board-category">{category.name}</div>
+                    {category.questions.map((question, questionIndex) => {
+                        const cardKey = `${categoryIndex}-${questionIndex}`;
+                        const isUsed = usedCards.has(cardKey);
+                        return (
+                            <button
+                                key={questionIndex}
+                                className={`board-cell ${isUsed ? 'board-cell--used' : 'board-cell--available'}`}
+                                onClick={() => !isUsed && onSelectCard(categoryIndex, questionIndex, question.value)}
+                                disabled={isUsed}
+                            >
+                                {isUsed ? '' : `$${question.value}`}
+                            </button>
+                        );
+                    })}
                 </div>
             ))}
         </div>
     );
 }
-
-export default Scoreboard;
 ```
 
-Legg merke til **template literals** (backtick-streng): `` `score-card ${betingelse ? 'klasse-a' : 'klasse-b'}` `` – dette lar oss sette CSS-klasser dynamisk.
-
-</details>
-
-#### Steg 5b-2 – Legg til currentTeamIndex og tur-indikator i App.jsx
-
-🏆 Legg til `currentTeamIndex`-state i `App.jsx` og vis hvem sin tur det er over brettet.
-
-<details>
-<summary>💡 Slik holder du styr på hvem sin tur det er</summary>
-
-```jsx
-const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
-
-// I JSX:
-<div className="turn-indicator">{teams[currentTeamIndex].name} sin tur</div>
-<Scoreboard teams={teams} currentTeamIndex={currentTeamIndex} />
-```
-
-</details>
-
----
-
-### Oppgave 5c – Registrer rett/galt og oppdater poeng
-
-#### Steg 5c-1 – Legg til rett/galt-knapper i QuestionCard
-
-🏆 Oppdater `QuestionCard.jsx` til å ta imot en `onResult`-prop og `teamName`. Vis to knapper etter at svaret er avslørt: «Rett» og «Galt».
-
-<details>
-<summary>💡 Slik legger du til rett/galt-knapper</summary>
-
-```jsx
-// QuestionCard tar imot onResult og teamName som props:
-function QuestionCard({ question, answer, value, teamName, onResult, onBack }) {
-
-    // ...
-
-    {revealed && (
-        <>
-            <div className="answer-section">
-                <div className="answer-label">Svar:</div>
-                <div className="answer-text">{answer}</div>
-            </div>
-            <div className="judge-section">
-                <div className="judge-prompt">
-                    Svarte <strong>{teamName}</strong> rett?
-                </div>
-                <div className="judge-actions">
-                    <button className="btn btn--wrong" onClick={() => onResult(false)}>
-                        ✗ Galt
-                    </button>
-                    <button className="btn btn--correct" onClick={() => onResult(true)}>
-                        ✓ Rett (+{value})
-                    </button>
-                </div>
-            </div>
-        </>
-    )}
-```
-
-`<>...</>` kalles et **Fragment** – det lar deg returnere flere JSX-elementer uten å pakke dem i en ekstra `<div>`.
-
-</details>
-
-#### Steg 5c-2 – Hold styr på brukte kort
-
-🏆 Legg til en `usedCards`-state i `App.jsx` som er et `Set` (en samling unike verdier). Merk kort som brukt etter hvert spørsmål, og vis brukte kort annerledes i `Board`.
-
-> 💡 **Hva er et Set?**
-> Et `Set` er en JavaScript-samling som bare inneholder unike verdier – ingen duplikater. Vi bruker det for å holde styr på hvilke kort som er brukt: `usedCards.has('0-2')` sjekker om kortet i kolonne 0, rad 2 er brukt.
-
-<details>
-<summary>💡 Slik bruker du Set for brukte kort</summary>
-
-```jsx
-const [usedCards, setUsedCards] = useState(new Set());
-
-// Legg til et brukt kort (f.eks. i handleResult):
-const newUsed = new Set(usedCards); // kopier eksisterende Set
-newUsed.add(`${colIndex}-${rowIndex}`);
-setUsedCards(newUsed);
-```
-
-I `Board.jsx`, sjekk om kortet er brukt:
-
-```jsx
-function Board({ usedCards, onSelectCard }) {
-    // ...
-    {pointValues.map((value, rowIndex) => {
-        const cardKey = `${colIndex}-${rowIndex}`;
-        const isUsed = usedCards.has(cardKey);
-        return (
-            <button
-                key={rowIndex}
-                className={`board-cell ${isUsed ? 'board-cell--used' : 'board-cell--available'}`}
-                onClick={() => !isUsed && onSelectCard(colIndex, rowIndex, value)}
-                disabled={isUsed}
-            >
-                {isUsed ? '' : `$${value}`}
-            </button>
-        );
-    })}
-```
-
-</details>
-
-#### Steg 5c-3 – Oppdater poeng og roter til neste lag
-
-🏆 Lag `handleResult`-funksjonen i `App.jsx`. Den skal oppdatere poeng hvis svaret var rett, merke kortet som brukt, og gå videre til neste lags tur.
-
-<details>
-<summary>💡 Slik oppdaterer du poeng og bytter tur</summary>
-
-```jsx
-function handleResult(correct) {
-    const cardKey = `${activeCard.colIndex}-${activeCard.rowIndex}`;
-
-    // Oppdater poeng hvis rett svar
-    if (correct) {
-        setTeams((prev) => {
-            const updated = prev.map((t) => ({ ...t })); // kopier alle lag
-            updated[currentTeamIndex].score += activeCard.value;
-            return updated;
-        });
-    }
-
-    // Merk kortet som brukt
-    const newUsed = new Set(usedCards);
-    newUsed.add(cardKey);
-    setUsedCards(newUsed);
-
-    // Lukk spørsmålskortet
-    setActiveCard(null);
-
-    // Gå til neste lag (loop tilbake til lag 0 etter siste lag)
-    setCurrentTeamIndex((prev) => (prev + 1) % teams.length);
-}
-```
-
-`% teams.length` er modulo-operatoren. Den sørger for at vi looper tilbake til lag 0 etter siste lag.
-
-</details>
-
-#### Steg 5c-4 – Avslutt spillet og vis vinneren
-
-🏆 Sjekk etter hvert spørsmål om alle kortene er brukt. Sett `phase` til `"finished"` og vis en avslutningsskjerm med vinneren.
-
-<details>
-<summary>💡 Slik avslutter du spillet</summary>
-
-```jsx
-const TOTAL_CARDS = questionsData.categories.length * 5; // 25 kort totalt
-
-// I handleResult, etter at kortet er lagt til usedCards:
-if (newUsed.size >= TOTAL_CARDS) {
-    setPhase('finished');
-}
-```
-
-Og legg til avslutningsskjermen i `App.jsx`:
-
-```jsx
-if (phase === 'finished') {
-    const winner = teams.reduce((best, t) => (t.score > best.score ? t : best), teams[0]);
-    return (
-        <div className="finished-screen">
-            <h1 className="finished-title">🏆 Spillet er over!</h1>
-            <p className="finished-winner">
-                Vinneren er: <strong>{winner.name}</strong> med {winner.score} poeng!
-            </p>
-            <div className="finished-scores">
-                {[...teams]
-                    .sort((a, b) => b.score - a.score)
-                    .map((t, i) => (
-                        <div key={i} className="finished-score-row">
-                            <span>{i + 1}. {t.name}</span>
-                            <span>{t.score} poeng</span>
-                        </div>
-                    ))}
-            </div>
-            <button className="start-button" onClick={() => setPhase('setup')}>
-                Spill igjen
-            </button>
-        </div>
-    );
-}
-```
-
-`teams.reduce(...)` går gjennom alle lag og finner det med høyest poengsum.
+`usedCards.has(cardKey)` returnerer `true` hvis kortet er brukt. Vi bruker det til å sette riktig CSS-klasse og deaktivere knappen.
 
 </details>
 
 <details>
-<summary>🚨 Løsningsforslag – komplett App.jsx</summary>
+<summary>🚨 Løsningsforslag – ferdig App.jsx og Board.jsx</summary>
+
+`src/App.jsx`:
 
 ```jsx
 import { useState } from 'react';
 import './App.css';
-import SetupScreen from './components/SetupScreen';
 import Board from './components/Board';
 import QuestionCard from './components/QuestionCard';
-import Scoreboard from './components/Scoreboard';
 import questionsData from './questions.json';
 
-const TOTAL_CARDS = questionsData.categories.length * 5;
-
 function App() {
-    const [phase, setPhase] = useState('setup');
-    const [teams, setTeams] = useState([]);
-    const [currentTeamIndex, setCurrentTeamIndex] = useState(0);
     const [usedCards, setUsedCards] = useState(new Set());
     const [activeCard, setActiveCard] = useState(null);
 
-    function handleStart(teamNames) {
-        setTeams(teamNames.map((name) => ({ name, score: 0 })));
-        setCurrentTeamIndex(0);
-        setUsedCards(new Set());
+    function handleSelectCard(categoryIndex, questionIndex, value) {
+        const { question, answer } =
+            questionsData.categories[categoryIndex].questions[questionIndex];
+        setActiveCard({ categoryIndex, questionIndex, value, question, answer });
+    }
+
+    function handleBackToBoard() {
         setActiveCard(null);
-        setPhase('game');
     }
 
-    function handleSelectCard(colIndex, rowIndex, value) {
-        const { question, answer } = questionsData.categories[colIndex].questions[rowIndex];
-        setActiveCard({ colIndex, rowIndex, value, question, answer });
-    }
-
-    function handleResult(correct) {
-        const cardKey = `${activeCard.colIndex}-${activeCard.rowIndex}`;
-
-        if (correct) {
-            setTeams((prev) => {
-                const updated = prev.map((t) => ({ ...t }));
-                updated[currentTeamIndex].score += activeCard.value;
-                return updated;
-            });
-        }
-
+    function handleResult() {
+        const cardKey = `${activeCard.categoryIndex}-${activeCard.questionIndex}`;
         const newUsed = new Set(usedCards);
         newUsed.add(cardKey);
         setUsedCards(newUsed);
         setActiveCard(null);
-        setCurrentTeamIndex((prev) => (prev + 1) % teams.length);
-
-        if (newUsed.size >= TOTAL_CARDS) {
-            setPhase('finished');
-        }
-    }
-
-    if (phase === 'setup') {
-        return <SetupScreen onStart={handleStart} />;
-    }
-
-    if (phase === 'finished') {
-        const winner = teams.reduce((best, t) => (t.score > best.score ? t : best), teams[0]);
-        return (
-            <div className="finished-screen">
-                <h1 className="finished-title">🏆 Spillet er over!</h1>
-                <p className="finished-winner">
-                    Vinneren er: <strong>{winner.name}</strong> med {winner.score} poeng!
-                </p>
-                <div className="finished-scores">
-                    {[...teams]
-                        .sort((a, b) => b.score - a.score)
-                        .map((t, i) => (
-                            <div key={i} className="finished-score-row">
-                                <span>{i + 1}. {t.name}</span>
-                                <span>{t.score} poeng</span>
-                            </div>
-                        ))}
-                </div>
-                <button className="start-button" onClick={() => setPhase('setup')}>
-                    Spill igjen
-                </button>
-            </div>
-        );
     }
 
     return (
         <div className="game-screen">
             <h1 className="game-title">🎯 Jeopardy</h1>
-            <div className="turn-indicator">{teams[currentTeamIndex].name} sin tur</div>
             <Board usedCards={usedCards} onSelectCard={handleSelectCard} />
-            <Scoreboard teams={teams} currentTeamIndex={currentTeamIndex} />
 
             {activeCard && (
                 <QuestionCard
                     question={activeCard.question}
                     answer={activeCard.answer}
                     value={activeCard.value}
-                    teamName={teams[currentTeamIndex].name}
                     onResult={handleResult}
-                    onBack={() => setActiveCard(null)}
+                    onBack={handleBackToBoard}
                 />
             )}
         </div>
@@ -1423,6 +1064,42 @@ function App() {
 }
 
 export default App;
+```
+
+`src/components/Board.jsx`:
+
+```jsx
+import questionsData from '../questions.json';
+
+function Board({ usedCards, onSelectCard }) {
+    const { categories } = questionsData;
+
+    return (
+        <div className="board">
+            {categories.map((category, categoryIndex) => (
+                <div key={categoryIndex} className="board-column">
+                    <div className="board-category">{category.name}</div>
+                    {category.questions.map((question, questionIndex) => {
+                        const cardKey = `${categoryIndex}-${questionIndex}`;
+                        const isUsed = usedCards.has(cardKey);
+                        return (
+                            <button
+                                key={questionIndex}
+                                className={`board-cell ${isUsed ? 'board-cell--used' : 'board-cell--available'}`}
+                                onClick={() => !isUsed && onSelectCard(categoryIndex, questionIndex, question.value)}
+                                disabled={isUsed}
+                            >
+                                {isUsed ? '' : `$${question.value}`}
+                            </button>
+                        );
+                    })}
+                </div>
+            ))}
+        </div>
+    );
+}
+
+export default Board;
 ```
 
 </details>
