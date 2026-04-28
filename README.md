@@ -1,5 +1,4 @@
 # 🎯 Jeopardy-workshop
-
 I denne workshopen skal vi lage et digitalt Jeopardy-spill i React – steg for steg!
 
 Når vi er ferdige vil spillet ha:
@@ -9,6 +8,11 @@ Når vi er ferdige vil spillet ha:
 -   Mulighet til å vise svaret
 
 Ingen kunnskap om React er nødvendig på forhånd – vi forklarer det vi trenger underveis. 🚀
+
+---
+
+## Sett opp og publisere en nettside 🏄
+Følg guiden for "React" her: https://github.com/bekk/prosjektutgangspunkt
 
 ---
 
