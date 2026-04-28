@@ -1,13 +1,13 @@
 # 🎯 Jeopardy-workshop
-I denne workshopen skal vi lage et digitalt Jeopardy-spill i React – steg for steg!
+I denne workshopen skal vi lage et digitalt Jeopardy-spill i React!
 
 Når vi er ferdige vil spillet ha:
 
 -   Et 5×5 brett med kategorier og poengsummer
 -   Spørsmål som dukker opp når man trykker på et kort
--   Mulighet til å vise svaret
+-   Mulighet til å vise fasit
 
-Ingen kunnskap om React er nødvendig på forhånd – vi forklarer det vi trenger underveis. 🚀
+Ingen kunnskap om React er nødvendig på forhånd, vi forklarer det som trengs underveis. 🚀
 
 ---
 
@@ -28,7 +28,7 @@ Du vil se noen emojis i oppgavene:
 
 ## React på 2 minutter
 
-Har du aldri brukt React før? Her er det absolutt viktigste du trenger å vite!
+Hvis du aldri har brukt React før så kan du lese mer her for å lære det viktigste!
 
 <details>
 <summary>Klikk her for en rask introduksjon til React</summary>
@@ -154,12 +154,9 @@ npm run dev
 
 Spørsmålene og svarene skal ligge i en egen fil slik at de er lette å endre uten å røre selve koden.
 
-> 💡 **Hva er JSON?**
-> JSON (JavaScript Object Notation) er et tekstformat for å lagre og transportere data. Det ser ut som et JavaScript-objekt, men er egentlig bare tekst. JSON brukes overalt for å lagre og dele data mellom systemer.
-
 ### Steg 1a – Lag filen
 
-🏆 Lag filen `src/questions.json`. Du kan gjøre dette i filutforskeren i VS Code: høyreklikk på `src`-mappen og velg «New File».
+🏆 Lag filen `src/questions.json`.
 
 ### Steg 1b – Kopier inn spørsmålene
 
